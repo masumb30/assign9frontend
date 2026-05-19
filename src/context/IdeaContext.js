@@ -1,0 +1,252 @@
+'use client';
+
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import { useToast } from './ToastContext';
+
+const IdeaContext = createContext();
+
+// Mock Initial Data
+const INITIAL_IDEAS = [
+    {
+        id: '1',
+        title: 'EcoTrack: Personal Carbon Footprint API',
+        shortDesc: 'A unified API for developers to easily calculate real-time carbon offsets for e-commerce checkouts.',
+        longDesc: 'EcoTrack solves the complex problem of measuring carbon footprints for individual online purchases. We provide a developer-friendly API that integrates into major e-commerce platforms (Shopify, WooCommerce, Magento). When a user checks out, we instantly calculate the shipping emission based on distance and weight, offering a one-click offset micro-transaction. Our goal is to make sustainability effortless for both the retailer and the consumer.',
+        category: 'Tech',
+        tags: ['API', 'Sustainability', 'E-commerce'],
+        author: 'Sarah Chen',
+        authorId: 'user-1',
+        estimatedBudget: '$50k - $100k',
+        targetAudience: 'E-commerce Developers, Sustainable Brands',
+        problemStatement: 'Calculating per-transaction carbon footprint requires complex logistics APIs and emission conversion models that most small-medium businesses cannot afford to implement.',
+        proposedSolution: 'A scalable REST API that abstracts the calculation and partners directly with verified carbon offset projects to automate the supply chain of sustainability.',
+        imageUrl: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800&q=80',
+        createdAt: '2026-05-10T10:00:00Z',
+        likes: 124,
+        comments: [
+            { id: 'c1', userId: 'user-2', userName: 'David Kim', text: 'Brilliant! Would pay a premium for this plugin on Shopify.', createdAt: '2026-05-11T14:20:00Z' },
+            { id: 'c2', userId: 'user-3', userName: 'Emma Wright', text: 'How do you verify the offset projects? That is usually the bottleneck.', createdAt: '2026-05-12T09:15:00Z', isEdited: false }
+        ]
+    },
+    {
+        id: '2',
+        title: 'NeuroFlow: AI Sleep Optimization Wearable',
+        shortDesc: 'A comfortable, non-intrusive headband that uses safe audio frequencies to induce deep sleep states.',
+        longDesc: 'NeuroFlow uses state-of-the-art EEG sensors packed inside a breathable sleeping band. By monitoring brainwaves in real-time, it plays customized binaural ambient sounds that guide the brain into deeper REM cycles. Unlike normal sleep trackers that just give you data, NeuroFlow actually intervenes to fix your sleep architecture safely and naturally.',
+        category: 'Health',
+        tags: ['Wearable', 'AI', 'Wellness'],
+        author: 'Dr. Marcus Webb',
+        authorId: 'user-4',
+        estimatedBudget: '$200k+',
+        targetAudience: 'Insomniacs, Biohackers, High Performers',
+        problemStatement: 'Current wearables only track sleep but do not actively improve it in real-time.',
+        proposedSolution: 'Closed-loop audio stimulation based on real-time brainwave monitoring to optimize sleep stages instantaneously.',
+        imageUrl: 'https://images.unsplash.com/photo-1512438248247-f0f2a5a8b7f0?w=800&q=80',
+        createdAt: '2026-05-12T08:30:00Z',
+        likes: 342,
+        comments: []
+    },
+    {
+        id: '3',
+        title: 'LearnSphere: VR Classrooms for Remote Kids',
+        shortDesc: 'Immersive educational environments that bring the physical classroom experience to remote learning.',
+        longDesc: 'LearnSphere is building a platform for Quest and Vision Pro that allows teachers to host completely interactive, physics-based virtual classrooms. Kids can perform chemistry experiments safely, visit historical sites in 3D, and interact with peers via spatial audio, solving the isolation problem of standard remote video calls.',
+        category: 'Education',
+        tags: ['VR/AR', 'EdTech', 'Metaverse'],
+        author: 'Elena Rodriguez',
+        authorId: 'user-5',
+        estimatedBudget: '$150k - $300k',
+        targetAudience: 'Remote Schools, Homeschooling Parents, Tutors',
+        problemStatement: 'Zoom classes lead to high unengagement rates and lack the spatial, hands-on learning crucial for child development.',
+        proposedSolution: 'A localized multiplayer VR engine specialized in educational physics and safe social interaction.',
+        imageUrl: 'https://images.unsplash.com/photo-1593508512255-86ab42a8e620?w=800&q=80',
+        createdAt: '2026-05-14T11:45:00Z',
+        likes: 89,
+        comments: []
+    },
+    {
+        id: '4',
+        title: 'FinAlign: Micro-Investing for Freelancers',
+        shortDesc: 'Automated fractional investing that scales with unpredictable income streams.',
+        longDesc: 'Freelancers have variable income which makes traditional monthly saving plans fail. FinAlign connects to freelancer bank accounts, detects incoming payments, and algorithms determine a safe percentage to sweep into a diversified ETF portfolio without hurting short-term liquidity needs.',
+        category: 'Fintech',
+        tags: ['Investing', 'Freelance', 'Automation'],
+        author: 'James H',
+        authorId: 'user-6',
+        estimatedBudget: '$100k - $200k',
+        targetAudience: 'Freelancers, Gig Economy Workers',
+        problemStatement: 'Variable income makes strict monthly budgeting and investing impossible for gig workers.',
+        proposedSolution: 'Dynamic percentage-based sweep accounts powered by predictive cash flow AI.',
+        imageUrl: 'https://images.unsplash.com/photo-1579621970563-ebec7560ff3e?w=800&q=80',
+        createdAt: '2026-05-15T16:20:00Z',
+        likes: 210,
+        comments: []
+    },
+    {
+        id: '5',
+        title: 'CodeReview.ai: Instant PR Feedback',
+        shortDesc: 'AI-agents that instantly review pull requests for logic flaws, security, and styling.',
+        longDesc: 'Hooking directly into GitHub and GitLab, CodeReview.ai runs local LLM instances that understand your entire repository context. It leaves human-like comments on PRs within seconds of creation, drastically reducing the bottleneck for senior engineers while maintaining code quality.',
+        category: 'AI',
+        tags: ['DevTools', 'LLM', 'Productivity'],
+        author: 'Alex Doe',
+        authorId: 'mock-user-1', // Matches mock user
+        estimatedBudget: '$50k',
+        targetAudience: 'Software Teams, Open Source Maintainers',
+        problemStatement: 'Human PR reviews take too much time and block rapid deployment cycles.',
+        proposedSolution: 'Context-aware AI reviews that handle 80% of routine checks.',
+        imageUrl: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80',
+        createdAt: '2026-05-16T09:10:00Z',
+        likes: 531,
+        comments: [
+            { id: 'c3', userId: 'user-3', userName: 'Emma Wright', text: 'I use something similar, but context length is always an issue. How do you feed the whole repo?', createdAt: '2026-05-16T12:00:00Z' }
+        ]
+    },
+    {
+        id: '6',
+        title: 'MediChain: Secure Patient Data Transfer',
+        shortDesc: 'Blockchain protocol for instant, secure sharing of medical records between hospitals.',
+        longDesc: 'Instead of faxing records or relying on fragmented portals, MediChain uses zero-knowledge proofs on a private ledger. Patients hold the keys to their data and can instantly grant read-access to any specialist worldwide, ensuring 100% HIPAA compliance and removing administrative friction.',
+        category: 'Health',
+        tags: ['Blockchain', 'Security', 'Healthcare'],
+        author: 'Dr. Anna Lee',
+        authorId: 'user-7',
+        estimatedBudget: '$500k+',
+        targetAudience: 'Hospitals, Clinics, Patients with complex conditions',
+        problemStatement: 'Medical records are siloed, leading to redundant tests and dangerous lack of context during emergencies.',
+        proposedSolution: 'A zero-knowledge blockchain architecture giving patients control over unified medical histories.',
+        imageUrl: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=800&q=80',
+        createdAt: '2026-05-17T14:00:00Z',
+        likes: 195,
+        comments: []
+    }
+];
+
+export function IdeaProvider({ children }) {
+    const [ideas, setIdeas] = useState(INITIAL_IDEAS);
+    const { addToast } = useToast();
+
+    // The logged-in mock user
+    const mockUser = {
+        id: 'mock-user-1',
+        name: 'Alex Doe',
+        email: 'alex@example.com',
+        avatar: 'A'
+    };
+
+    const addIdea = useCallback((newIdea) => {
+        const idea = {
+            ...newIdea,
+            id: Date.now().toString(),
+            author: mockUser.name,
+            authorId: mockUser.id,
+            createdAt: new Date().toISOString(),
+            likes: 0,
+            comments: []
+        };
+        setIdeas(prev => [idea, ...prev]);
+        addToast({ type: 'success', title: 'Idea Submitted', message: 'Your innovative idea is now live in the vault.' });
+    }, [mockUser.name, mockUser.id, addToast]);
+
+    const updateIdea = useCallback((id, updatedFields) => {
+        setIdeas(prev => prev.map(idea => {
+            if (idea.id === id && idea.authorId === mockUser.id) {
+                return { ...idea, ...updatedFields };
+            }
+            return idea;
+        }));
+        addToast({ type: 'success', title: 'Idea Updated', message: 'Your idea details have been saved.' });
+    }, [mockUser.id, addToast]);
+
+    const deleteIdea = useCallback((id) => {
+        setIdeas(prev => prev.filter(idea => idea.id !== id));
+        addToast({ type: 'info', title: 'Idea Deleted', message: 'Your idea has been permanently removed.' });
+    }, [addToast]);
+
+    // Comment Actions
+    const addComment = useCallback((ideaId, text) => {
+        setIdeas(prev => prev.map(idea => {
+            if (idea.id === ideaId) {
+                const newComment = {
+                    id: Date.now().toString(),
+                    userId: mockUser.id,
+                    userName: mockUser.name,
+                    text,
+                    createdAt: new Date().toISOString(),
+                    isEdited: false
+                };
+                return { ...idea, comments: [...idea.comments, newComment] };
+            }
+            return idea;
+        }));
+        addToast({ type: 'success', title: 'Comment Posted', message: 'Feedback added.' });
+    }, [mockUser, addToast]);
+
+    const editComment = useCallback((ideaId, commentId, newText) => {
+        setIdeas(prev => prev.map(idea => {
+            if (idea.id === ideaId) {
+                return {
+                    ...idea,
+                    comments: idea.comments.map(c =>
+                        c.id === commentId && c.userId === mockUser.id
+                            ? { ...c, text: newText, isEdited: true }
+                            : c
+                    )
+                };
+            }
+            return idea;
+        }));
+        addToast({ type: 'success', title: 'Comment Updated' });
+    }, [mockUser.id, addToast]);
+
+    const deleteComment = useCallback((ideaId, commentId) => {
+        setIdeas(prev => prev.map(idea => {
+            if (idea.id === ideaId) {
+                return {
+                    ...idea,
+                    comments: idea.comments.filter(c => c.id !== commentId)
+                };
+            }
+            return idea;
+        }));
+        addToast({ type: 'info', title: 'Comment Removed' });
+    }, [addToast]);
+
+
+    // Helper selectors
+    const getIdeaById = (id) => ideas.find(i => i.id === id);
+    const getMyIdeas = () => ideas.filter(i => i.authorId === mockUser.id);
+    const getMyInteractions = () => {
+        // Return ideas where the user has commented, but is not the author
+        return ideas.filter(idea =>
+            idea.authorId !== mockUser.id &&
+            idea.comments.some(c => c.userId === mockUser.id)
+        );
+    };
+
+    return (
+        <IdeaContext.Provider value={{
+            ideas,
+            mockUser,
+            addIdea,
+            updateIdea,
+            deleteIdea,
+            addComment,
+            editComment,
+            deleteComment,
+            getIdeaById,
+            getMyIdeas,
+            getMyInteractions
+        }}>
+            {children}
+        </IdeaContext.Provider>
+    );
+}
+
+export function useIdeas() {
+    const context = useContext(IdeaContext);
+    if (context === undefined) {
+        throw new Error('useIdeas must be used within an IdeaProvider');
+    }
+    return context;
+}
