@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { Mail, Lock, LogIn, ArrowRight, Github } from 'lucide-react';
+import { Mail, Lock, LogIn, ArrowRight } from 'lucide-react';
 import { useToast } from '@/context/ToastContext';
 
 export default function LoginPage() {
@@ -28,7 +28,7 @@ export default function LoginPage() {
 
                     <div className="text-center mb-10">
                         <div className="inline-flex p-3 bg-blue-100 dark:bg-blue-900/30 rounded-2xl mb-4">
-                            <LogIn className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                            {/* <LogIn className="w-6 h-6 text-blue-600 dark:text-blue-400" /> */}
                         </div>
                         <h1 className="text-3xl font-black text-slate-900 dark:text-white">Sign In</h1>
                         <p className="text-slate-500 dark:text-slate-400 mt-2 font-medium">Access your global innovation hub</p>
@@ -38,7 +38,7 @@ export default function LoginPage() {
                         <div className="space-y-2">
                             <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Email Address</label>
                             <div className="relative group">
-                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                                {/* <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" /> */}
                                 <input
                                     type="email"
                                     value={email}
@@ -56,7 +56,7 @@ export default function LoginPage() {
                                 <Link href="/login" className="text-xs font-bold text-blue-600 hover:underline">Forgot?</Link>
                             </div>
                             <div className="relative group">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
+                                {/* <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" /> */}
                                 <input
                                     type="password"
                                     value={password}
@@ -100,7 +100,7 @@ export default function LoginPage() {
                             Google
                         </button>
                         <button className="flex items-center justify-center gap-2 py-3 border border-slate-200 dark:border-slate-800 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800 transition font-bold text-sm">
-                            <Github className="w-5 h-5" />
+                            {/* <Github className="w-5 h-5" /> */}
                             Github
                         </button>
                     </div>

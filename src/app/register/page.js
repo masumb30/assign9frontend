@@ -4,14 +4,15 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { User, Mail, Image as ImageIcon, Lock, UserPlus, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useToast } from '@/context/ToastContext';
+import { signupAction } from '@/actions';
 
 export default function RegisterPage() {
     const { addToast } = useToast();
     const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        photoUrl: '',
-        password: ''
+        username: 'Masum Billah',
+        email: 'masum@vault.com',
+        photoUrl: 'https://avatars.githubusercontent.com/u/583231?v=4',
+        password: 'Password123'
     });
 
     const [errors, setErrors] = useState({});
@@ -37,7 +38,7 @@ export default function RegisterPage() {
         }
     };
 
-    const handleRegister = (e) => {
+    const handleRegister = async (e) => {
         e.preventDefault();
         const passErrors = validate('password', formData.password);
 
@@ -49,6 +50,8 @@ export default function RegisterPage() {
             });
             return;
         }
+        console.log("sign up data: ", JSON.stringify(formData))
+        const result = await signupAction(null, formData);
 
         addToast({
             type: 'success',
@@ -74,13 +77,13 @@ export default function RegisterPage() {
                     <form onSubmit={handleRegister} className="space-y-5">
 
                         <div className="space-y-1.5">
-                            <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">Full Name</label>
+                            <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">User Name</label>
                             <div className="relative group">
                                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                                 <input
                                     type="text"
-                                    name="name"
-                                    value={formData.name}
+                                    name="username"
+                                    value={formData.username}
                                     onChange={handleChange}
                                     placeholder="John Innovator"
                                     required
@@ -110,7 +113,7 @@ export default function RegisterPage() {
                             <div className="relative group">
                                 <ImageIcon className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" />
                                 <input
-                                    type="url"
+                                    type="text"
                                     name="photoUrl"
                                     value={formData.photoUrl}
                                     onChange={handleChange}
