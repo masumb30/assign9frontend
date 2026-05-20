@@ -43,3 +43,46 @@ export async function signupAction(prevState, formData) {
 }
 
 
+export async function signinAction(prevState, formData) {
+    console.log('form data: ', formData)
+
+    // Basic validation check
+    if (!formData.email || !formData.password) {
+        return {
+            success: false,
+            message: "Email and password are required.",
+        };
+    }
+
+    try {
+        // Hitting your external API endpoint for login
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/login`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email: formData.email, password: formData.password }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            return {
+                success: false,
+                message: data.message || "Invalid credentials or login failed.",
+            };
+        }
+
+
+
+    } catch (error) {
+        return {
+            success: false,
+            message: "Failed to connect to the server. Please try again later.",
+        };
+    }
+
+    redirect("/");
+}
+
+

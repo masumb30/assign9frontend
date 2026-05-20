@@ -4,14 +4,16 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { Mail, Lock, LogIn, ArrowRight } from 'lucide-react';
 import { useToast } from '@/context/ToastContext';
+import { signinAction } from '@/actions';
 
 export default function LoginPage() {
     const { addToast } = useToast();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    const handleLogin = (e) => {
+    const handleLogin = async (e) => {
         e.preventDefault();
+        const result = await signinAction(email, password);
         addToast({ type: 'success', title: 'Welcome Back!', message: 'Successfully signed in to your vault.' });
     };
 
