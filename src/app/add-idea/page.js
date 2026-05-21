@@ -14,6 +14,51 @@ import {
     ArrowRight,
     Sparkles
 } from 'lucide-react';
+import { authClient } from '@/lib/auth-client';
+
+const InputWrapper = ({ label, name, formData, handleChange, icon: Icon, placeholder, type = 'text', required = true }) => (
+    <div className="space-y-2">
+        <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">
+            {label}
+        </label>
+        <div className="relative group">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors">
+                <Icon className="w-5 h-5" />
+            </div>
+            <input
+                type={type}
+                name={name}
+                value={formData[name]}
+                onChange={handleChange}
+                placeholder={placeholder}
+                required={required}
+                className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-slate-900 dark:text-white shadow-sm"
+            />
+        </div>
+    </div>
+);
+
+const TextAreaWrapper = ({ label, name, formData, handleChange, icon: Icon, placeholder, required = true, rows = 4 }) => (
+    <div className="space-y-2">
+        <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">
+            {label}
+        </label>
+        <div className="relative group">
+            <div className="absolute left-4 top-5 text-slate-400 group-focus-within:text-blue-500 transition-colors">
+                <Icon className="w-5 h-5" />
+            </div>
+            <textarea
+                name={name}
+                value={formData[name]}
+                onChange={handleChange}
+                placeholder={placeholder}
+                required={required}
+                rows={rows}
+                className="w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-slate-900 dark:text-white shadow-sm resize-none"
+            />
+        </div>
+    </div>
+);
 
 export default function AddIdeaPage() {
     const router = useRouter();
@@ -39,7 +84,7 @@ export default function AddIdeaPage() {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         // Process tags into array
@@ -48,53 +93,32 @@ export default function AddIdeaPage() {
             tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag !== '')
         };
 
-        addIdea(ideaData);
-        router.push('/ideas');
+        const { data, error } = await authClient.token()
+        if (error) {
+            // handle error
+        }
+        if (data) {
+            const jwtToken = data.token
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ideas`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${jwtToken}`
+                    },
+                    body: JSON.stringify(ideaData)
+                });
+                const data = await response.json();
+                console.log("idea posted result: ", data);
+                // if data is success then show a toast and clear form fields. 
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
     };
 
-    const InputWrapper = ({ label, name, icon: Icon, placeholder, type = 'text', required = true }) => (
-        <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">
-                {label}
-            </label>
-            <div className="relative group">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-blue-500 transition-colors">
-                    <Icon className="w-5 h-5" />
-                </div>
-                <input
-                    type={type}
-                    name={name}
-                    value={formData[name]}
-                    onChange={handleChange}
-                    placeholder={placeholder}
-                    required={required}
-                    className="w-full pl-12 pr-4 py-3.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-slate-900 dark:text-white shadow-sm"
-                />
-            </div>
-        </div>
-    );
 
-    const TextAreaWrapper = ({ label, name, icon: Icon, placeholder, required = true, rows = 4 }) => (
-        <div className="space-y-2">
-            <label className="text-sm font-bold text-slate-700 dark:text-slate-300 ml-1">
-                {label}
-            </label>
-            <div className="relative group">
-                <div className="absolute left-4 top-5 text-slate-400 group-focus-within:text-blue-500 transition-colors">
-                    <Icon className="w-5 h-5" />
-                </div>
-                <textarea
-                    name={name}
-                    value={formData[name]}
-                    onChange={handleChange}
-                    placeholder={placeholder}
-                    required={required}
-                    rows={rows}
-                    className="w-full pl-12 pr-4 py-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none transition-all text-slate-900 dark:text-white shadow-sm resize-none"
-                />
-            </div>
-        </div>
-    );
 
     return (
         <div className="py-16 bg-slate-50 dark:bg-slate-950 min-h-screen">
@@ -122,6 +146,8 @@ export default function AddIdeaPage() {
                             <InputWrapper
                                 label="Idea Title"
                                 name="title"
+                                formData={formData}
+                                handleChange={handleChange}
                                 icon={Lightbulb}
                                 placeholder="e.g. EcoTrack: Carbon API"
                             />
@@ -146,6 +172,8 @@ export default function AddIdeaPage() {
                         <TextAreaWrapper
                             label="Short Hook"
                             name="shortDesc"
+                            formData={formData}
+                            handleChange={handleChange}
                             icon={AlignLeft}
                             placeholder="Give us a 1-sentence punchy elevator pitch..."
                             rows={2}
@@ -154,6 +182,8 @@ export default function AddIdeaPage() {
                         <TextAreaWrapper
                             label="Detailed Vision"
                             name="longDesc"
+                            formData={formData}
+                            handleChange={handleChange}
                             icon={AlignLeft}
                             placeholder="Explain the full scope of your concept, how it works, and the impact it will have..."
                             rows={6}
@@ -168,24 +198,32 @@ export default function AddIdeaPage() {
                             <InputWrapper
                                 label="Tags"
                                 name="tags"
+                                formData={formData}
+                                handleChange={handleChange}
                                 icon={Tag}
                                 placeholder="AI, Sustainability, DevTools (comma separated)"
                             />
                             <InputWrapper
                                 label="Image URL"
                                 name="imageUrl"
+                                formData={formData}
+                                handleChange={handleChange}
                                 icon={ImageIcon}
                                 placeholder="https://images.unsplash.com/photo..."
                             />
                             <InputWrapper
                                 label="Estimated Budget"
                                 name="estimatedBudget"
+                                formData={formData}
+                                handleChange={handleChange}
                                 icon={DollarSign}
                                 placeholder="e.g. $50k - $100k"
                             />
                             <InputWrapper
                                 label="Target Audience"
                                 name="targetAudience"
+                                formData={formData}
+                                handleChange={handleChange}
                                 icon={Users}
                                 placeholder="e.g. Early-stage founders, E-commerce owners"
                             />
@@ -199,6 +237,8 @@ export default function AddIdeaPage() {
                         <TextAreaWrapper
                             label="The Problem"
                             name="problemStatement"
+                            formData={formData}
+                            handleChange={handleChange}
                             icon={AlertCircle}
                             placeholder="What exact friction point or gap in the market are you addressing?"
                         />
@@ -206,6 +246,8 @@ export default function AddIdeaPage() {
                         <TextAreaWrapper
                             label="The Proposed Solution"
                             name="proposedSolution"
+                            formData={formData}
+                            handleChange={handleChange}
                             icon={Sparkles}
                             placeholder="How does your concept uniquely solve the problem above?"
                         />

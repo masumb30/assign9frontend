@@ -1,15 +1,24 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from "next/server";
+import { headers } from "next/headers";
+import { auth } from "./lib/auth";
 
-// This function can be marked `async` if using `await` inside
-export function proxy(request) {
-    // console.log("request: ", request)
-    // return NextResponse.redirect(new URL('/home', request.url))
+export async function proxy(request) {
+    const session = await auth.api.getSession({
+        headers: await headers()
+    })
+
+    if (!session) {
+        // return NextResponse.redirect(new URL("/login", request.url));
+
+        const loginUrl = new URL('/login', request.url);
+        // Pass the original path + search params as a query param
+        loginUrl.searchParams.set('callbackUrl', request.nextUrl.pathname + request.nextUrl.search);
+        return NextResponse.redirect(loginUrl);
+    }
+
     return NextResponse.next();
 }
 
-// Alternatively, you can use a default export:
-// export default function proxy(request) { ... }
-
 export const config = {
-    matcher: ['/about/:path*', '/login'],
-}
+    matcher: ["/add-idea", "/my-ideas", "/my-interactions"], // Specify the routes the middleware applies to
+};

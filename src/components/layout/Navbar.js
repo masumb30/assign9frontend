@@ -6,16 +6,21 @@ import { usePathname } from 'next/navigation';
 import { Menu, X, Sun, Moon, Lightbulb, User } from 'lucide-react';
 import { useTheme } from '@/context/ThemeContext';
 import { useIdeas } from '@/context/IdeaContext';
+import { authClient } from '@/lib/auth-client';
 
 export function Navbar() {
+    const { data: session, isPending } = authClient.useSession();
+    const user = session?.user;
     const [isOpen, setIsOpen] = useState(false);
     const [isProfileOpen, setIsProfileOpen] = useState(false);
     const { theme, toggleTheme } = useTheme();
-    const { mockUser } = useIdeas();
     const pathname = usePathname();
 
-    // Mock Auth State
-    const isAuth = !!mockUser;
+    const handleSignOut = async () => {
+        await authClient.signOut();
+        setIsOpen(false);
+        window.location.reload();
+    };
 
     const navLinks = [
         { name: 'Home', href: '/' },
@@ -38,7 +43,7 @@ export function Navbar() {
                         {link.name}
                     </Link>
                 ))}
-                {!isAuth ? (
+                {!user ? (
                     <div className="mt-8 flex flex-col gap-4">
                         <Link href="/login" onClick={() => setIsOpen(false)} className="w-full py-3 text-center rounded-lg border border-slate-200 dark:border-slate-700 font-medium">Log In</Link>
                         <Link href="/register" onClick={() => setIsOpen(false)} className="w-full py-3 text-center rounded-lg bg-blue-600 text-white font-medium">Sign Up</Link>
@@ -46,15 +51,28 @@ export function Navbar() {
                 ) : (
                     <div className="mt-8 py-4 px-4 bg-slate-50 dark:bg-slate-800 rounded-xl">
                         <div className="flex items-center gap-3 mb-4">
-                            <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">
-                                {mockUser.name.charAt(0)}
-                            </div>
+                            {user.image ? (
+                                <img src={user.image} alt={user.name} className="w-10 h-10 rounded-full object-cover" />
+                            ) : (
+                                <div className="w-10 h-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-lg">
+                                    {user.name?.charAt(0) || 'U'}
+                                </div>
+                            )}
                             <div>
-                                <p className="font-medium">{mockUser.name}</p>
-                                <p className="text-sm text-slate-500">{mockUser.email}</p>
+                                <p className="font-medium text-slate-900 dark:text-white">{user.name}</p>
+                                <p className="text-sm text-slate-500">{user.email}</p>
                             </div>
                         </div>
-                        <button className="w-full py-2 text-red-500 font-medium text-left border-t border-slate-200 dark:border-slate-700 mt-2 pt-4">Sign Out</button>
+                        <button
+                            onClick={async () => {
+                                await authClient.signOut();
+                                setIsOpen(false);
+                                window.location.reload();
+                            }}
+                            className="w-full py-2 text-red-500 font-medium text-left border-t border-slate-200 dark:border-slate-700 mt-2 pt-4"
+                        >
+                            Sign Out
+                        </button>
                     </div>
                 )}
             </div>
@@ -103,7 +121,9 @@ export function Navbar() {
 
                     {/* Desktop Auth */}
                     <div className="hidden md:block relative">
-                        {!isAuth ? (
+                        {isPending ? (
+                            <div className="w-8 h-8 rounded-full border-2 border-slate-200 border-t-blue-600 animate-spin"></div>
+                        ) : !user ? (
                             <div className="flex items-center gap-2">
                                 <Link href="/login" className="px-4 py-2 text-sm font-medium hover:text-blue-600 transition">Log In</Link>
                                 <Link href="/register" className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition shadow-sm hover:shadow-md">
@@ -116,20 +136,33 @@ export function Navbar() {
                                     onClick={() => setIsProfileOpen(!isProfileOpen)}
                                     className="flex items-center gap-2 p-1 pl-3 pr-1 rounded-full border border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600 transition"
                                 >
-                                    <span className="text-sm font-medium max-w-[100px] truncate">{mockUser.name}</span>
-                                    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
-                                        <User className="w-4 h-4" />
-                                    </div>
+                                    <span className="text-sm font-medium max-w-[100px] truncate">{user.name}</span>
+                                    {user.image ? (
+                                        <img src={user.image} alt={user.name} className="w-8 h-8 rounded-full object-cover" />
+                                    ) : (
+                                        <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white">
+                                            <User className="w-4 h-4" />
+                                        </div>
+                                    )}
                                 </button>
                                 {/* Profile Dropdown */}
                                 {isProfileOpen && (
                                     <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-xl border border-slate-100 dark:border-slate-700 py-2 z-50">
                                         <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-700 mb-2">
-                                            <p className="text-sm font-medium truncate">{mockUser.name}</p>
-                                            <p className="text-xs text-slate-500 truncate">{mockUser.email}</p>
+                                            <p className="text-sm font-medium truncate text-slate-900 dark:text-white">{user.name}</p>
+                                            <p className="text-xs text-slate-500 truncate">{user.email}</p>
                                         </div>
                                         <Link href="/my-ideas" className="block px-4 py-2 text-sm hover:bg-slate-50 dark:hover:bg-slate-700 transition">My Profile</Link>
-                                        <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition">Sign Out</button>
+                                        <button
+                                            onClick={async () => {
+                                                await authClient.signOut();
+                                                setIsProfileOpen(false);
+                                                window.location.reload();
+                                            }}
+                                            className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/10 transition"
+                                        >
+                                            Sign Out
+                                        </button>
                                     </div>
                                 )}
                             </div>

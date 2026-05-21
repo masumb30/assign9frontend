@@ -6,6 +6,7 @@ import { Mail, Lock, LogIn, ArrowRight } from 'lucide-react';
 import { useToast } from '@/context/ToastContext';
 import { signinAction } from '@/actions';
 import { authClient } from '@/lib/auth-client';
+import { redirect } from 'next/navigation';
 
 export default function LoginPage() {
     const { addToast } = useToast();
@@ -20,6 +21,7 @@ export default function LoginPage() {
             email,
             password,
         });
+        redirect('/')
         console.log('sign in result from better auth: ', result);
     };
 
