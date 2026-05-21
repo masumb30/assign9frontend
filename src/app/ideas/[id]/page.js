@@ -6,19 +6,17 @@ import Link from 'next/link';
 
 export default async function IdeaDetailsPage({ params }) {
     const { id } = await params;
-    console.log('id...................: ', id)
     // fetch idea by id
     const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ideas/${id}`);
     const idea = await response.json();
-    console.log('single idea: ', idea)
 
     if (!idea) {
         return (
             <div className="container mx-auto px-4 py-24 text-center">
                 <h2 className="text-2xl font-bold mb-4">Idea not found</h2>
-                <button onClick={() => router.push('/ideas')} className="text-blue-600 hover:underline">
+                <Link href="/ideas" className="text-blue-600 hover:underline">
                     Return to directory
-                </button>
+                </Link>
             </div>
         );
     }
@@ -28,13 +26,13 @@ export default async function IdeaDetailsPage({ params }) {
             <div className="container mx-auto px-4 md:px-6">
 
                 {/* Breadcrumb / Back */}
-                <button
-                    onClick={() => router.back()}
+                <Link
+                    href="/ideas"
                     className="flex items-center gap-2 text-slate-500 hover:text-slate-900 dark:hover:text-white transition mb-8 group"
                 >
                     <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
                     <span>Back to Vault</span>
-                </button>
+                </Link>
 
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
 
@@ -115,7 +113,7 @@ export default async function IdeaDetailsPage({ params }) {
                         </div>
 
                         {/* Interaction System */}
-                        <CommentSection ideaId={idea.id} comments={idea.comments} />
+                        <CommentSection ideaId={idea._id} />
 
                     </div>
 
