@@ -16,9 +16,9 @@ export default function Navbar() {
     const { theme, toggleTheme } = useTheme();
 
     const navLinks = [
-        { name: 'Vault', href: '/ideas' },
-        { name: 'Pitch', href: '/add-idea' },
-        { name: 'My Vault', href: '/my-ideas' },
+        { name: 'Ideas', href: '/ideas' },
+        { name: 'Add Idea', href: '/add-idea' },
+        { name: 'My Ideas', href: '/my-ideas' },
         { name: 'Interactions', href: '/my-interactions' },
     ];
 
