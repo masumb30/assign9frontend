@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { User, Mail, Image as ImageIcon, Lock, UserPlus, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { useToast } from '@/context/ToastContext';
 import { signupAction } from '@/actions';
+import { authClient } from '@/lib/auth-client';
 
 export default function RegisterPage() {
     const { addToast } = useToast();
@@ -51,7 +52,13 @@ export default function RegisterPage() {
             return;
         }
         console.log("sign up data: ", JSON.stringify(formData))
-        const result = await signupAction(null, formData);
+        // const result = await signupAction(null, formData);
+        const result = await authClient.signUp.email({
+            email: formData.email,
+            password: formData.password,
+            name: formData.username,
+            photoUrl: formData.photoUrl
+        })
 
         addToast({
             type: 'success',

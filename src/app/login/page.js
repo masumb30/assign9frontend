@@ -5,19 +5,29 @@ import Link from 'next/link';
 import { Mail, Lock, LogIn, ArrowRight } from 'lucide-react';
 import { useToast } from '@/context/ToastContext';
 import { signinAction } from '@/actions';
+import { authClient } from '@/lib/auth-client';
 
 export default function LoginPage() {
     const { addToast } = useToast();
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [email, setEmail] = useState('masum@vault.com');
+    const [password, setPassword] = useState('Password123');
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        const result = await signinAction(email, password);
-        addToast({ type: 'success', title: 'Welcome Back!', message: 'Successfully signed in to your vault.' });
+        // const result = await signinAction(email, password);
+        // addToast({ type: 'success', title: 'Welcome Back!', message: 'Successfully signed in to your vault.' });
+        const result = await authClient.signIn.email({
+            email,
+            password,
+        });
+        console.log('sign in result from better auth: ', result);
     };
 
-    const handleGoogleLogin = () => {
+    const handleGoogleLogin = async () => {
+        const result = await authClient.signIn.social({
+            provider: 'google',
+        })
+        console.log('sign in result from better auth: ', result);
         addToast({ type: 'info', title: 'Redirecting...', message: 'Connecting to Google Authentication...' });
     };
 
@@ -42,6 +52,7 @@ export default function LoginPage() {
                             <div className="relative group">
                                 {/* <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-blue-500 transition-colors" /> */}
                                 <input
+
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
