@@ -40,10 +40,13 @@ export function IdeaCard({ idea, showActions = false, children }) {
                     </div>
                     <div className="flex items-center gap-1.5 whitespace-nowrap overflow-hidden col-span-2">
                         <Tag className="w-3.5 h-3.5 flex-shrink-0" />
-                        <span className="truncate">{idea.tags.join(', ')}</span>
+                        <span className="truncate">{Array.isArray(idea.tags) ? idea.tags.join(', ') : ''}</span>
+
                     </div>
                 </div>
-
+                <div className="text-xs font-medium text-slate-400 flex justify-end">
+                    <p>Created on:</p>{new Date(idea.createdAt).toLocaleDateString()}
+                </div>
                 {/* Footer Actions */}
                 <div className="flex items-center justify-between mt-auto">
                     {!showActions ? (
@@ -59,9 +62,7 @@ export function IdeaCard({ idea, showActions = false, children }) {
                             {children}
                         </div>
                     )}
-                    <div className="text-xs font-medium text-slate-400">
-                        {new Date(idea.createdAt).toLocaleDateString()}
-                    </div>
+
                 </div>
             </div>
         </div>

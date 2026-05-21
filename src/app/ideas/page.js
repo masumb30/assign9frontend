@@ -1,27 +1,42 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { useIdeas } from '@/context/IdeaContext';
+import { useState, useMemo, useEffect } from 'react';
 import { IdeaCard } from '@/components/ideas/IdeaCard';
 import { SearchFilterSuite } from '@/components/ideas/SearchFilterSuite';
 import { Lightbulb, Ghost } from 'lucide-react';
 
 export default function IdeasPage() {
-    const { ideas } = useIdeas();
+    const [allIdeas, setAllIdeas] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [category, setCategory] = useState('All');
     const [dateRange, setDateRange] = useState('latest');
 
-    const filteredIdeas = useMemo(() => {
-        let result = [...ideas];
+    useEffect(() => {
+        const fetchIdeas = async () => {
+            setIsLoading(true);
+            try {
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ideas`);
+                const data = await response.json();
+                setAllIdeas(Array.isArray(data) ? data : []);
+            } catch (error) {
+                console.error("Error fetching ideas:", error);
+                setAllIdeas([]);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchIdeas();
+    }, []);
 
-        // Search Filter
-        if (searchQuery) {
+    const filteredIdeas = useMemo(() => {
+        let result = [...allIdeas];
+
+        // Search Filter (Matches title case-insensitively as requested)
+        if (searchQuery.trim()) {
             const query = searchQuery.toLowerCase();
             result = result.filter(idea =>
-                idea.title.toLowerCase().includes(query) ||
-                idea.shortDesc.toLowerCase().includes(query) ||
-                idea.tags.some(tag => tag.toLowerCase().includes(query))
+                idea.title.toLowerCase().includes(query)
             );
         }
 
@@ -36,11 +51,12 @@ export default function IdeasPage() {
         } else if (dateRange === 'oldest') {
             result.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
         } else if (dateRange === 'trending') {
-            result.sort((a, b) => b.likes + b.comments.length - (a.likes + a.comments.length));
+            result.sort((a, b) => (b.likes || 0) + (b.comments?.length || 0) - ((a.likes || 0) + (a.comments?.length || 0)));
         }
 
         return result;
-    }, [ideas, searchQuery, category, dateRange]);
+    }, [allIdeas, searchQuery, category, dateRange]);
+
 
     return (
         <div className="py-12 bg-slate-50 dark:bg-slate-950 min-h-screen">
@@ -73,13 +89,18 @@ export default function IdeasPage() {
                 />
 
                 {/* Grid */}
-                {filteredIdeas.length > 0 ? (
+                {isLoading ? (
+                    <div className="flex items-center justify-center py-24">
+                        <div className="w-12 h-12 border-4 border-blue-600/30 border-t-blue-600 rounded-full animate-spin"></div>
+                    </div>
+                ) : filteredIdeas.length > 0 ? (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
                         {filteredIdeas.map(idea => (
-                            <IdeaCard key={idea.id} idea={idea} />
+                            <IdeaCard key={idea._id || idea.id} idea={idea} />
                         ))}
                     </div>
                 ) : (
+
                     <div className="flex flex-col items-center justify-center py-24 text-center">
                         <div className="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mb-6">
                             <Ghost className="w-10 h-10 text-slate-400" />

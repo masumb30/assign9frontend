@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
 import { toast, ToastContainer } from 'react-toastify';
+import TestIdeaGenerator from './TestIdeaGenerator';
 
 const InputWrapper = ({ label, name, formData, handleChange, icon: Icon, placeholder, type = 'text', required = true }) => (
     <div className="space-y-2">
@@ -77,6 +78,7 @@ export default function AddIdeaPage() {
         problemStatement: '',
         proposedSolution: ''
     });
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const categories = ['Tech', 'Health', 'AI', 'Education', 'Fintech', 'SaaS', 'Sustainability'];
 
@@ -87,6 +89,7 @@ export default function AddIdeaPage() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
 
         // Process tags into array
         const ideaData = {
@@ -129,7 +132,11 @@ export default function AddIdeaPage() {
                 // if data is success then show a toast and clear form fields. 
             } catch (error) {
                 console.error('Error:', error);
+            } finally {
+                setIsSubmitting(false);
             }
+        } else {
+            setIsSubmitting(false);
         }
 
     };
@@ -152,6 +159,8 @@ export default function AddIdeaPage() {
                         Fill out the blueprint for your next big thing. Be detailed, clear, and ready for the community to validate your concept.
                     </p>
                 </div>
+
+                <TestIdeaGenerator onGenerate={(data) => setFormData(data)} />
 
                 <form onSubmit={handleSubmit} className="space-y-8">
 
@@ -281,10 +290,15 @@ export default function AddIdeaPage() {
                         </button>
                         <button
                             type="submit"
-                            className="w-full sm:flex-1 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black shadow-xl shadow-blue-500/25 transition-all flex items-center justify-center gap-2 group"
+                            disabled={isSubmitting}
+                            className="w-full sm:flex-1 py-4 bg-blue-600 hover:bg-blue-700 disabled:opacity-70 disabled:cursor-pointer text-white rounded-2xl font-black shadow-xl shadow-blue-500/25 transition-all flex items-center justify-center gap-2 group"
                         >
-                            Deploy to Vault
-                            <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            {isSubmitting ? (
+                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                            ) : (
+                                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                            )}
+                            <span>{isSubmitting ? 'Deploying...' : 'Deploy to Vault'}</span>
                         </button>
                     </div>
 

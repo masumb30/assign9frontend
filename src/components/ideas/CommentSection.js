@@ -15,7 +15,7 @@ export function CommentSection({ ideaId }) {
             const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/comments/${ideaId}`);
             const data = await response.json();
             console.log("comments data: ", data)
-            setComments(data);
+            setComments(Array.isArray(data) ? data : []);
         };
         fetchComments();
     }, [ideaId]);
@@ -33,7 +33,7 @@ export function CommentSection({ ideaId }) {
             body: JSON.stringify({ comment }),
         });
         const comments = await response.json();
-        setComments(comments);
+        setComments(Array.isArray(comments) ? comments : []);
     };
 
     const editComment = async (ideaId, commentId, comment) => {
@@ -49,7 +49,7 @@ export function CommentSection({ ideaId }) {
         });
         if (response.ok) {
             const updatedComments = await response.json();
-            setComments(updatedComments);
+            setComments(Array.isArray(updatedComments) ? updatedComments : []);
             return true;
         }
         return false;
@@ -66,7 +66,7 @@ export function CommentSection({ ideaId }) {
         });
         if (response.ok) {
             const updatedComments = await response.json();
-            setComments(updatedComments);
+            setComments(Array.isArray(updatedComments) ? updatedComments : []);
             return true;
         }
         return false;
@@ -113,7 +113,7 @@ export function CommentSection({ ideaId }) {
 
             {/* Comment List */}
             <div className="space-y-6">
-                {comments.map((comment) => (
+                {comments?.map((comment) => (
                     <CommentCard
                         key={comment._id}
                         comment={comment}

@@ -1,4 +1,4 @@
-const INITIAL_IDEAS = [
+export const INITIAL_IDEAS = [
     {
         id: '1',
         title: 'EcoTrack: Personal Carbon Footprint API',
