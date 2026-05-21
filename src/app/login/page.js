@@ -7,8 +7,14 @@ import { useToast } from '@/context/ToastContext';
 import { signinAction } from '@/actions';
 import { authClient } from '@/lib/auth-client';
 import { redirect } from 'next/navigation';
+import { useRouter, useSearchParams } from "next/navigation";
+import { toast, ToastContainer } from "react-toastify";
+
 
 export default function LoginPage() {
+    const searchParams = useSearchParams();
+    const router = useRouter();
+    const callbackUrl = searchParams.get('callbackUrl') || '/';
     const { addToast } = useToast();
     const [email, setEmail] = useState('masum@vault.com');
     const [password, setPassword] = useState('Password123');
@@ -17,12 +23,17 @@ export default function LoginPage() {
         e.preventDefault();
         // const result = await signinAction(email, password);
         // addToast({ type: 'success', title: 'Welcome Back!', message: 'Successfully signed in to your vault.' });
-        const result = await authClient.signIn.email({
+        const { data, error } = await authClient.signIn.email({
             email,
             password,
         });
-        redirect('/')
-        console.log('sign in result from better auth: ', result);
+        if (!error) {
+            router.push(callbackUrl);
+            router.refresh();
+        }
+        if (error) {
+            toast.error(error.message);
+        }
     };
 
     const handleGoogleLogin = async () => {
@@ -35,6 +46,8 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-[85vh] flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4">
+
+            <ToastContainer autoClose={1000} />
             <div className="w-full max-w-md">
 
                 {/* Card */}

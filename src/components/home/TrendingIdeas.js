@@ -1,15 +1,14 @@
-'use client';
 
-import { useIdeas } from '@/context/IdeaContext';
+
+
 import { IdeaCard } from '@/components/ideas/IdeaCard';
 import Link from 'next/link';
 import { ArrowRight, Flame } from 'lucide-react';
 
-export function TrendingIdeas() {
-    const { ideas } = useIdeas();
-
-    // Get top 6 by likes/engagement fake sort (just take first 6 for now)
-    const trending = ideas.slice(0, 6);
+export async function TrendingIdeas() {
+    // fetch trending ideas from the rest api
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ideas`);
+    const ideas = await response.json();
 
     return (
         <section className="py-20 bg-slate-50 dark:bg-slate-950">
@@ -35,8 +34,8 @@ export function TrendingIdeas() {
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-                    {trending.map(idea => (
-                        <IdeaCard key={idea.id} idea={idea} />
+                    {ideas.map(idea => (
+                        <IdeaCard key={idea._id} idea={idea} />
                     ))}
                 </div>
 

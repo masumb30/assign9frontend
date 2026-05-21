@@ -20,5 +20,5 @@ export async function proxy(request) {
 }
 
 export const config = {
-    matcher: ["/add-idea", "/my-ideas", "/my-interactions"], // Specify the routes the middleware applies to
+    matcher: ["/add-idea", "/my-ideas", "/my-interactions", "/ideas/:path*"], // Specify the routes the middleware applies to
 };

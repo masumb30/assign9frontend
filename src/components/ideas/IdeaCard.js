@@ -48,7 +48,7 @@ export function IdeaCard({ idea, showActions = false, children }) {
                 <div className="flex items-center justify-between mt-auto">
                     {!showActions ? (
                         <Link
-                            href={`/ideas/${idea.id}`}
+                            href={`/ideas/${idea._id}`}
                             className="inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-slate-900 dark:text-white bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg transition"
                         >
                             View Details

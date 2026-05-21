@@ -1,17 +1,16 @@
-'use client';
 
-import { useParams, useRouter } from 'next/navigation';
-import { useIdeas } from '@/context/IdeaContext';
+
 import { CommentSection } from '@/components/ideas/CommentSection';
 import { ArrowLeft, Calendar, Tag, DollarSign, Users, Info, Rocket, BrainCircuit } from 'lucide-react';
 import Link from 'next/link';
 
-export default function IdeaDetailsPage() {
-    const { id } = useParams();
-    const router = useRouter();
-    const { getIdeaById } = useIdeas();
-
-    const idea = getIdeaById(id);
+export default async function IdeaDetailsPage({ params }) {
+    const { id } = await params;
+    console.log('id...................: ', id)
+    // fetch idea by id
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ideas/${id}`);
+    const idea = await response.json();
+    console.log('single idea: ', idea)
 
     if (!idea) {
         return (

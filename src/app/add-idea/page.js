@@ -15,6 +15,7 @@ import {
     Sparkles
 } from 'lucide-react';
 import { authClient } from '@/lib/auth-client';
+import { toast, ToastContainer } from 'react-toastify';
 
 const InputWrapper = ({ label, name, formData, handleChange, icon: Icon, placeholder, type = 'text', required = true }) => (
     <div className="space-y-2">
@@ -110,6 +111,21 @@ export default function AddIdeaPage() {
                 });
                 const data = await response.json();
                 console.log("idea posted result: ", data);
+                if (data.ideaId) {
+                    toast.success("Idea posted successfully");
+                    setFormData({
+                        title: '',
+                        shortDesc: '',
+                        longDesc: '',
+                        category: 'Tech',
+                        tags: '',
+                        imageUrl: '',
+                        estimatedBudget: '',
+                        targetAudience: '',
+                        problemStatement: '',
+                        proposedSolution: ''
+                    });
+                }
                 // if data is success then show a toast and clear form fields. 
             } catch (error) {
                 console.error('Error:', error);
@@ -122,6 +138,7 @@ export default function AddIdeaPage() {
 
     return (
         <div className="py-16 bg-slate-50 dark:bg-slate-950 min-h-screen">
+            <ToastContainer autoClose={1500} />
             <div className="container mx-auto px-4 max-w-4xl">
 
                 <div className="text-center mb-12">
