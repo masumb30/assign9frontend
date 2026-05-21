@@ -16,7 +16,7 @@ export default function IdeasPage() {
         const fetchIdeas = async () => {
             setIsLoading(true);
             try {
-                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/ideas`);
+                const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/allideas`);
                 const data = await response.json();
                 setAllIdeas(Array.isArray(data) ? data : []);
             } catch (error) {
