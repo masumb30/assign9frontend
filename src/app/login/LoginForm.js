@@ -12,6 +12,7 @@ import { toast, ToastContainer } from "react-toastify";
 
 
 export default function LoginForm() {
+    const [signingIn, setSigningIn] = useState(false);
     const searchParams = useSearchParams();
     const router = useRouter();
     const callbackUrl = searchParams.get('callbackUrl') || '/';
@@ -20,7 +21,9 @@ export default function LoginForm() {
     const [password, setPassword] = useState('Password123');
 
     const handleLogin = async (e) => {
+
         e.preventDefault();
+        setSigningIn(true);
         // const result = await signinAction(email, password);
         // addToast({ type: 'success', title: 'Welcome Back!', message: 'Successfully signed in to your vault.' });
         const { data, error } = await authClient.signIn.email({
@@ -29,11 +32,13 @@ export default function LoginForm() {
         });
         if (!error) {
             router.push(callbackUrl);
-            router.refresh();
+            // router.refresh();
         }
         if (error) {
+            console.log('sign in error: ', error)
             toast.error(error.message);
         }
+        setSigningIn(false);
     };
 
     const handleGoogleLogin = async () => {
@@ -98,9 +103,9 @@ export default function LoginForm() {
 
                         <button
                             type="submit"
-                            className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black shadow-xl shadow-blue-500/25 transition-all flex items-center justify-center gap-2 group"
+                            className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-black shadow-xl shadow-blue-500/25 transition-all flex items-center justify-center gap-2 group cursor-pointer"
                         >
-                            Sign In
+                            {signingIn ? 'Signing In...' : 'Sign In'}
                             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                         </button>
                     </form>
