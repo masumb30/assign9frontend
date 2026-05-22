@@ -1,37 +1,35 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# 💡 IdeaVault – Startup Idea Sharing Platform
 
-## Getting Started
+IdeaVault is a modern, dynamic web application designed for entrepreneurs, creators, and innovators to share startup concepts, gather community feedback, and collaboratively validate business ideas. By replacing standard booking mechanisms with deep social interaction, IdeaVault serves as a crowdfunding space for thoughts, allowing users to discover trending innovation, refine project scopes, and build teams organically.
 
-First, run the development server:
+🌐 **[Live Application Link](https://assign9frontend.onrender.com)**  
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+## 🚀 Core Features
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+*   **Secure Authentication & Dual Identity Access:** Fully integrated email/password and Google OAuth workflows backed by stateless JSON Web Tokens (JWT). Private routes are strictly protected, keeping users securely authenticated even across hard page reloads.
+*   **Complete CRUD Idea Pipeline:** Authenticated users can draft, publish, modify, and delete structural startup pitches complete with problem statements, proposed solutions, category filtering, target audience profiling, and budget estimates.
+*   **Dynamic Context-Aware Comments System:** An interactive feedback mechanism allowing users to append, live-edit, and delete historical comments on idea profile pages, fostering real-time crowdsourced validation.
+*   **Smart Query Engine (Search & Filter):** Features server-side case-insensitive `$regex` matching on idea titles alongside instant category-based drop-down filtering for fluid discovery in a 3-column responsive grid layout.
+*   **Global Adaptive Theme Switching:** A comprehensive Light and Dark mode toggle built directly into the main navigation layout that gracefully propagates state changes across the entire interface.
 
-## Learn More
+---
 
-To learn more about Next.js, take a look at the following resources:
+## 🛠️ Tech Stack & Architecture
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Client Side
+*   **Framework:**  Next.js (App Router)
+*   **Styling & UI:** Tailwind CSS, DaisyUI / ShadCN Component Libraries
+*   **State Management:** Zustand & TanStack Query (React Query)
+*   **Animations:** Framer Motion (for staggered grid cards and banner carousels)
+*   **Notifications:** React Hot Toast / Sonner (Zero native browser alerts utilized)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Server Side
+*   **Runtime Environment:** Node.js with Express.js
+*   **Database:**  MongoDB 
+*   **Security:** JSON Web Tokens (JWT) stored via HttpOnly cookies, bcryptjs for password hashing
 
-## Deploy on Vercel
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# assign9frontend
