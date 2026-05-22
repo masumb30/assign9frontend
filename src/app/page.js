@@ -8,7 +8,8 @@ import { headers } from 'next/headers';
 
 export default async function Home() {
 
-
+  console.log('TESTENV: GOES HERE:::::', process.env.TESTENV);
+  console.log('NEXT_PUBLIC_TEST_ENV: GOES HERE::::', process.env.NEXT_PUBLIC_TEST_ENV);
   return (
     <>
       <HeroCarousel />
